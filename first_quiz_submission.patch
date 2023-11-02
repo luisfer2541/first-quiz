@@ -1,0 +1,284 @@
+diff --git a/part1/question1.py b/part1/question1.py
+index 5c99fdb..e05e3ec 100644
+--- a/part1/question1.py
++++ b/part1/question1.py
+@@ -16,10 +16,12 @@
+ def get_city_temperature(city):
+    if city == "Quito":
+       return 22
+-   if city == "Sao Paulo":
++   elif city == "Sao Paulo":
+       return 17
+-   if city == "San Francisco":
++   elif city == "San Francisco":
+       return 16
++   elif city == "New York":
++      return 14
+ 
+ def get_city_weather(city):
+ 
+@@ -29,7 +31,9 @@ def get_city_weather(city):
+      sky_condition = "cloudy"
+   elif city == "New York":
+      sky_condition = "rainy"
++  elif city == "Quito":
++     sky_condition = "sunny"
+ 
+   temperature = get_city_temperature(city)
+-
++  
+   return str(temperature) + " degrees and " + sky_condition
+\ No newline at end of file
+diff --git a/part1/question2.py b/part1/question2.py
+index 34a9b01..d8f0499 100644
+--- a/part1/question2.py
++++ b/part1/question2.py
+@@ -15,7 +15,11 @@
+ # it. As always, there is a test suite that checks the result. It is in 
+ # `question2_test.py.`
+ 
+-swapper = None
++def function(tupla):
++    x, y = tupla
++    return (y, x)
++
++swapper = function
+ 
+ def run_swapper(list_of_tuples):
+   return list(map(swapper, list_of_tuples))
+\ No newline at end of file
+diff --git a/part1/question3.py b/part1/question3.py
+index 04fab99..ad5e1e0 100644
+--- a/part1/question3.py
++++ b/part1/question3.py
+@@ -26,19 +26,48 @@
+ # formulas and their outputs in the test file, `question3_test.py`.
+ 
+ # This function should return an oven instance!
++class MagicalOven:
++    def __init__(self):
++        self.ingredients = []
++        self.temperature = None
++
++    def add(self, item):
++        self.ingredients.append(item)
++
++    def freeze(self):
++        self.temperature = "freeze"
++
++    def boil(self):
++        self.temperature = "boil"
++
++    def wait(self):
++        pass
++
++    def get_output(self):
++        if self.temperature == "boil":
++            if "lead" in self.ingredients and "mercury" in self.ingredients:
++                return "gold"
++            elif "cheese" in self.ingredients and "dough" in self.ingredients and "tomato" in self.ingredients:
++                return "pizza"
++
++        elif self.temperature == "freeze":
++            if "water" in self.ingredients and "air" in self.ingredients:
++                return "snow"      
++        return "Invalid mix"
++
++   
++
+ def make_oven():
+-  None
++  return MagicalOven()
+ 
+ def alchemy_combine(oven, ingredients, temperature):
+-  
+   for item in ingredients:
+     oven.add(item)
+ 
+-  if temperature < 0:
+-    oven.freeze()
+-  elif temperature >= 100:
++  if temperature >= 100:
+     oven.boil()
++  elif temperature < 0:
++    oven.freeze()
+   else:
+     oven.wait()
+-
+-  return oven.get_output()
+\ No newline at end of file
++  return oven.get_output()
+diff --git a/part1/question3_test.py b/part1/question3_test.py
+index 6cb6c89..7a95d6c 100644
+--- a/part1/question3_test.py
++++ b/part1/question3_test.py
+@@ -1,3 +1,4 @@
++from question3 import * 
+ def test_alchemy_combine():
+ 
+   assert alchemy_combine(
+diff --git a/part1/question4.py b/part1/question4.py
+index 1e1b2bf..1e80f69 100644
+--- a/part1/question4.py
++++ b/part1/question4.py
+@@ -24,7 +24,11 @@ import pets_db
+ 
+ sql_pets_owned_by_nobody = """
+ 
+-Your SQL here.
++SELECT name, species, age
++FROM animals
++LEFT JOIN people_animals ON animal_id = pet_id
++WHERE owner_id IS NULL
++
+ 
+ """
+ 
+@@ -34,7 +38,11 @@ Your SQL here.
+ 
+ sql_pets_older_than_owner = """
+ 
+-Your SQL here.
++SELECT COUNT(*)
++FROM animals AS A
++JOIN people_animals ON A.animal_id = people_animals.pet_id
++JOIN people AS P ON people_animals.owner_id = P.person_id
++WHERE A.age > P.age
+ 
+ """
+ 
+@@ -43,6 +51,15 @@ Your SQL here.
+ # The output should be a list of tuples in the format: (<person name>, <pet name>, <species>)
+ sql_only_owned_by_bessie = """ 
+ 
+-Your SQL here.
++SELECT P.name, A.name, A.species
++FROM people AS P
++JOIN people_animals ON P.person_id = people_animals.owner_id
++JOIN animals AS A ON people_animals.pet_id = A.animal_id
++WHERE P.name = 'bessie'
++AND A.animal_id NOT IN (
++    SELECT pet_id
++    FROM people_animals
++    WHERE owner_id <> P.person_id
++);
+ 
+ """
+\ No newline at end of file
+diff --git a/part1/question5.py b/part1/question5.py
+index f76654f..9f372fc 100644
+--- a/part1/question5.py
++++ b/part1/question5.py
+@@ -20,7 +20,11 @@
+ 
+ sql_create_favorite_foods = """
+ 
+-Your SQL here.
++CREATE TABLE favorite_foods(
++    food_id Integer,
++    name Text,
++    vegetarian Integer
++    )
+ 
+ """
+ 
+@@ -30,7 +34,11 @@ Your SQL here.
+ 
+ sql_alter_tables_with_favorite_food = """
+ 
+-Your SQL here.
++ALTER TABLE animals
++ADD favorite_food_id Integer;
++
++ALTER TABLE people
++ADD favorite_food_id Integer
+ 
+ """
+ 
+@@ -40,6 +48,9 @@ Your SQL here.
+ 
+ sql_select_all_vegetarian_pets = """
+ 
+-Your SQL here.
++SELECT A.name, F.name
++FROM animals AS A
++JOIN favorite_foods AS F ON A.favorite_food_id = F.food_id
++WHERE F.vegetarian = 1;
+ 
+ """
+\ No newline at end of file
+diff --git a/part2/src/main/java/org/velezreyes/quiz/question6/VendingMachineImpl.java b/part2/src/main/java/org/velezreyes/quiz/question6/VendingMachineImpl.java
+index 85742c4..0595ee8 100644
+--- a/part2/src/main/java/org/velezreyes/quiz/question6/VendingMachineImpl.java
++++ b/part2/src/main/java/org/velezreyes/quiz/question6/VendingMachineImpl.java
+@@ -1,9 +1,65 @@
+ package org.velezreyes.quiz.question6;
+ 
+-public class VendingMachineImpl {
++public class VendingMachineImpl implements VendingMachine {
+ 
+-  public static VendingMachine getInstance() {
+-    // Fix me!
+-    return null;
+-  }
++    private static VendingMachineImpl instance = new VendingMachineImpl();
++    private int quarters;
++
++    private VendingMachineImpl() {
++    }
++
++    public static VendingMachine getInstance() {
++        return instance;
++    }
++
++    @Override
++    public Drink pressButton(String drinkName) throws NotEnoughMoneyException, UnknownDrinkException {
++        if ("ScottCola".equals(drinkName)) {
++            if (quarters >= 3) {
++                quarters -= 3;
++                return new ScottCola();
++            } else {
++                throw new NotEnoughMoneyException();
++            }
++        } else if ("KarenTea".equals(drinkName)) {
++            if (quarters >= 4) {
++                quarters -= 4;
++                return new KarenTea();
++            } else {
++                throw new NotEnoughMoneyException();
++            }
++        } else {
++            throw new UnknownDrinkException();
++        }
++    }
++
++    @Override
++    public void insertQuarter() {
++        quarters++;
++    }
++
++    private static class ScottCola implements Drink {
++        @Override
++        public String getName() {
++            return "ScottCola";
++        }
++
++        @Override
++        public boolean isFizzy() {
++            return true;
++        }
++    }
++
++    private static class KarenTea implements Drink {
++        @Override
++        public String getName() {
++            return "KarenTea";
++        }
++
++        @Override
++        public boolean isFizzy() {
++            return false;
++        }
++    }
+ }
++
